@@ -1,0 +1,54 @@
+/* ============================================================
+   Sthapati — Chola / Dravidian theme tokens
+   Inspired by the granite, bronze and gold of the great
+   Chola temples (Brihadeeswara, Gangaikonda Cholapuram).
+   Every component reads from these variables, so re-skinning
+   the entire site to another dynasty = swapping this file.
+   ============================================================ */
+
+[data-theme="chola"],
+sth-realm[theme="chola"],
+:root {
+  /* --- Stone & ground --- */
+  --sth-granite:        #2b2622;   /* dark temple granite       */
+  --sth-granite-2:      #3a342d;   /* lit granite face          */
+  --sth-sandstone:      #d8c3a0;   /* weathered sandstone       */
+  --sth-parchment:      #f3e9d6;   /* manuscript / palm leaf    */
+
+  /* --- Metal & flame --- */
+  --sth-bronze:         #8a5a2b;   /* Chola bronze idols        */
+  --sth-bronze-lit:     #b07a3c;
+  --sth-gold:           #d4a13c;   /* temple gold / kalasha     */
+  --sth-gold-bright:    #f2c45a;
+  --sth-vermilion:      #a3321e;   /* kumkum / sindoor accent   */
+  --sth-deepam:         #ff9d2e;   /* oil-lamp flame            */
+
+  /* --- Semantic roles --- */
+  --sth-bg:             var(--sth-granite);
+  --sth-surface:        var(--sth-granite-2);
+  --sth-ink:            var(--sth-parchment);
+  --sth-ink-muted:      #b9a98a;
+  --sth-accent:         var(--sth-gold);
+  --sth-accent-strong:  var(--sth-vermilion);
+  --sth-line:           rgba(212, 161, 60, 0.35);  /* carved gold line */
+
+  /* --- Form --- */
+  --sth-radius:         2px;       /* stone is squared, not soft */
+  --sth-carve:          0 1px 0 rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.06);
+  --sth-glow:           0 0 18px rgba(255, 157, 46, .35);
+
+  /* --- Type: an inscriptional, carved feel --- */
+  --sth-font-display:   "Marcellus", "Cinzel", "Trajan Pro", Georgia, serif;
+  --sth-font-body:      "Spectral", "Georgia", serif;
+  --sth-tracking:       0.12em;
+}
+
+/* Optional surface texture: faint granite grain via layered gradients. */
+.sth-stone {
+  background-color: var(--sth-bg);
+  background-image:
+    radial-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+    radial-gradient(rgba(0,0,0,.18) 1px, transparent 1px);
+  background-size: 7px 7px, 11px 11px;
+  background-position: 0 0, 3px 4px;
+}

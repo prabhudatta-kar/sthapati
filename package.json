@@ -1,0 +1,37 @@
+{
+  "name": "sthapati",
+  "version": "0.1.0",
+  "description": "Build the web like a temple — a framework-agnostic Web Component UI library that renders interfaces in the visual language of historical architecture (Chola/Dravidian theme first).",
+  "type": "module",
+  "main": "src/sthapati.js",
+  "module": "src/sthapati.js",
+  "exports": {
+    ".": "./src/sthapati.js",
+    "./theme/chola": "./src/themes/chola.css"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "CATALOG.md"
+  ],
+  "scripts": {
+    "dev": "npx --yes serve . -l 4178",
+    "start": "npx --yes serve . -l 4178"
+  },
+  "keywords": [
+    "web-components",
+    "ui-library",
+    "custom-elements",
+    "design-system",
+    "architecture",
+    "chola",
+    "dravidian",
+    "svg",
+    "ornament",
+    "themeable"
+  ],
+  "license": "MIT",
+  "sideEffects": [
+    "./src/sthapati.js"
+  ]
+}

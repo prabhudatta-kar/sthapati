@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="chola">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sthapati — Build the web like a temple</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Spectral:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="src/themes/chola.css" />
+  <script defer src="src/sthapati.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: var(--sth-font-body);
+      color: var(--sth-ink);
+      background-color: var(--sth-bg);
+      background-image:
+        radial-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        radial-gradient(rgba(0,0,0,.18) 1px, transparent 1px);
+      background-size: 7px 7px, 11px 11px;
+    }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 3rem 1.5rem 6rem; }
+    header { text-align: center; margin-bottom: 1rem; }
+    h1 {
+      font-family: var(--sth-font-display); letter-spacing: .18em;
+      text-transform: uppercase; font-size: 2.6rem; margin: .4rem 0 .2rem;
+      color: var(--sth-gold-bright);
+    }
+    .tag { color: var(--sth-ink-muted); letter-spacing: .2em; text-transform: uppercase;
+           font-size: .8rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 2rem; margin-top: 1rem; }
+    .colonnade { display: flex; align-items: stretch; gap: 0; margin: 2rem 0; }
+    .colonnade .bay { flex: 1; padding: 1.4rem 1.6rem; }
+    code { font-family: ui-monospace, monospace; color: var(--sth-gold); }
+    .muted { color: var(--sth-ink-muted); }
+    .gallery { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center;
+               align-items: flex-end; margin: 1.4rem 0; }
+    .gallery figure { margin: 0; text-align: center; }
+    .plate { display: flex; align-items: flex-end; justify-content: center;
+             min-height: 170px; padding: .6rem 1rem;
+             background: linear-gradient(180deg, rgba(255,255,255,.02), transparent);
+             border: 1px solid var(--sth-line); border-radius: 2px; }
+    .plate svg { display: block; }
+    figcaption { font-family: var(--sth-font-display); letter-spacing: .08em;
+                 text-transform: uppercase; font-size: .62rem; color: var(--sth-ink-muted);
+                 margin-top: .5rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <sth-lamp>Live demo</sth-lamp>
+      <h1>Sthapati</h1>
+      <p class="tag">Build the web like a temple · Chola theme</p>
+    </header>
+
+    <sth-divider label="The Carvings"></sth-divider>
+
+    <div class="gallery">
+      <figure><div class="plate" id="g-gopuram"></div><figcaption>Gopuram · gateway tower</figcaption></figure>
+      <figure><div class="plate" id="g-torana"></div><figcaption>Makara-torana · arch</figcaption></figure>
+      <figure><div class="plate" id="g-kirti"></div><figcaption>Kīrtimukha · face of glory</figcaption></figure>
+      <figure><div class="plate" id="g-deepam"></div><figcaption>Deepam · standing lamp</figcaption></figure>
+      <figure><div class="plate" id="g-lotus"></div><figcaption>Padma · lotus</figcaption></figure>
+    </div>
+    <script>
+      addEventListener("DOMContentLoaded", () => {
+        const O = window.Sthapati.ORNAMENT;
+        const set = (id, svg) => document.getElementById(id).innerHTML = svg;
+        set("g-gopuram", O.gopuram(190, 180));
+        set("g-torana",  O.torana(220, 150));
+        set("g-kirti",   O.kirtimukha(60, 60, 46));
+        set("g-deepam",  O.deepam(80, 150));
+        set("g-lotus",   O.lotusCap(120));
+      });
+    </script>
+
+    <sth-divider label="The Ornaments"></sth-divider>
+
+    <div class="grid">
+      <sth-card title="Gopuram" crown="true">
+        Cards rise under a tiered temple gateway, crowned with a kalasha.
+        <div style="margin-top:1rem">
+          <sth-button>Enter</sth-button>
+          <sth-button variant="ghost">Learn more</sth-button>
+        </div>
+      </sth-card>
+
+      <sth-card title="Inscription">
+        Body text is set in an inscriptional serif, as if carved into the
+        granite face of the shrine.
+        <sth-divider label="ca. 1010 CE"></sth-divider>
+        <span class="muted">Brihadeeswara, Thanjavur.</span>
+      </sth-card>
+
+      <sth-arch>
+        <h3 style="font-family:var(--sth-font-display);letter-spacing:.12em;color:var(--sth-accent)">Torana</h3>
+        <p>Any content can be framed inside a Dravidian arch.</p>
+        <sth-button variant="ghost">Pass through</sth-button>
+      </sth-arch>
+    </div>
+
+    <sth-divider label="Colonnade"></sth-divider>
+
+    <div class="colonnade">
+      <sth-pillar></sth-pillar>
+      <sth-jali class="bay" density="6">
+        <h3 style="font-family:var(--sth-font-display);letter-spacing:.12em;color:var(--sth-accent);margin-top:0">
+          Jali screen
+        </h3>
+        <p>A pierced-stone lattice sits behind content as a perforated veil —
+        light filtered through carved geometry. Wrap any section in
+        <code>&lt;sth-jali&gt;</code> for the effect.</p>
+        <sth-button>Request a darshan</sth-button>
+      </sth-jali>
+      <sth-pillar></sth-pillar>
+    </div>
+
+    <sth-divider label="One line to use it"></sth-divider>
+    <pre style="overflow:auto;background:var(--sth-surface);padding:1rem;border:1px solid var(--sth-line);border-radius:2px"><code>&lt;script defer src="src/sthapati.js"&gt;&lt;/script&gt;
+&lt;link rel="stylesheet" href="src/themes/chola.css"&gt;
+
+&lt;sth-card title="Gopuram"&gt;Hello, temple.&lt;/sth-card&gt;</code></pre>
+  </div>
+</body>
+</html>
