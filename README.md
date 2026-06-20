@@ -21,25 +21,42 @@ Works in **React, Vue, Svelte, or plain HTML** — they're standard Custom Eleme
 ```html
 <script defer src="src/sthapati.js"></script>
 <link rel="stylesheet" href="src/themes/chola.css" />
+<link rel="stylesheet" href="src/themes/gothic.css" />   <!-- optional 2nd theme -->
 
-<sth-card title="Gopuram">Hello, temple.</sth-card>
-<sth-button>Enter</sth-button>
+<html data-theme="chola">                 <!-- or "gothic" -->
+  <sth-crown></sth-crown>
+  <sth-card title="Gopuram">Hello, temple.</sth-card>
+  <sth-button>Enter</sth-button>
+
+<script>Sthapati.setTheme("gothic")</script>  <!-- reskins everything live -->
 ```
 
-Open `index.html` for the full live showcase.
+Open `index.html` for the full live showcase (with a Chola ⇄ Gothic switcher).
 
-## Components (v0.1)
+## Two kinds of tags
+
+**Semantic primitives** — the form is chosen by the active theme, so the *same
+markup* becomes a different building when you switch themes:
+
+| Tag | chola → | gothic → |
+|-----|---------|----------|
+| `<sth-crown>` | gopuram gateway tower | crocketed gable + pinnacles |
+| `<sth-arch>` | makara-torana | pointed lancet arch |
+| `<sth-screen density="6">` | kolam jali | bar tracery |
+| `<sth-column>` | kumbha pillar | clustered pier |
+| `<sth-divider label="…">` | lotus-capped frieze | fleur-de-lis frieze |
+| `<sth-card title="…">` | gopuram-crowned card | gable-crowned card |
+| `<sth-lamp>` | standing deepam | hanging lantern |
+
+**Named ornaments & utilities** — explicit pieces:
 
 | Tag | What it is |
 |-----|-----------|
-| `<sth-button variant="solid\|ghost">` | Bronze plinth button with carved pillar grooves |
-| `<sth-card title="..." crown="true\|false">` | Content panel crowned by a tiered gopuram |
-| `<sth-arch>` | Frames slotted content under a makara-torana arch (makaras + kīrtimukha) |
-| `<sth-divider label="...">` | Carved frieze line, lotus-capped at both ends |
-| `<sth-jali density="6">` | Pierced-stone lattice screen behind content |
-| `<sth-pillar>` | A fluted load-bearing column (flank a block to colonnade it) |
-| `<sth-lamp>` | A lit deepam (oil lamp) accent for live/featured states |
-| `<sth-realm theme="chola">` | Optional theme-scope wrapper for a subtree |
+| `<sth-button variant="solid\|ghost">` | Carved plinth button |
+| `<sth-jali density="6">` | Chola pierced-lattice screen |
+| `<sth-pillar>` | Chola kumbha column |
+| `<sth-rose-window size="120" spin>` | Gothic radial tracery (also a spinner) |
+| `<sth-realm theme="chola">` | Theme-scope wrapper for a subtree |
 
 ## The ornament engine
 
@@ -61,16 +78,25 @@ Each is built from the Dravidian vocabulary documented in the source: *tala,
 hara, kūṭa, śālā, kūḍu, kalaśa, makara, kīrtimukha, kumbha, potika*. Open
 `index.html` to see them rendered large in **The Carvings** gallery.
 
-## Theming
+## Theming — one attribute, a different dynasty
 
-Every component reads its color, scale and type from CSS custom properties
-defined in `src/themes/chola.css`. **Re-skinning the entire site to another
-dynasty is one file swap** — that's the core architectural idea of the library.
+Every component reads its color, scale and type from CSS custom properties, and
+its *ornament form* from a **theme registry** (`THEMES` in `src/sthapati.js`).
+Switching themes re-renders every live component automatically.
 
 ```html
-<html data-theme="chola">   <!-- whole page -->
-<sth-realm theme="chola">   <!-- or just a subtree -->
+<html data-theme="chola">     <!-- whole page -->
+<sth-realm theme="gothic">    <!-- or just a subtree -->
 ```
+```js
+Sthapati.setTheme("gothic");  // toggles <html data-theme> + re-renders
+Sthapati.themes();            // ["chola", "gothic"]
+```
+
+**Adding a new dynasty = two things:** (1) an entry in the `THEMES` registry
+mapping each role (`crown`, `arch`, `screen`, `column`, `cap`, `lamp`) to a
+generator, and (2) a matching `themes/<name>.css` defining the same CSS
+variables. No component code changes.
 
 ## The full vocabulary
 
@@ -84,9 +110,10 @@ specific motifs (`<sth-gopuram>`, `<sth-rose-window>`).
 ## Roadmap
 
 - [x] **Chola / Dravidian** theme (v0.1)
+- [x] **Semantic primitives** + theme registry (`crown`, `arch`, `screen`, `column`, …)
+- [x] **Gothic / European church** theme — pointed arches, tracery, crockets, fleur-de-lis
 - [ ] More ornaments: `<sth-nav>` colonnade bar, `<sth-shikhara>` headers,
       `<sth-input>` carved fields, `<sth-modal>` as a sanctum (garbhagriha)
-- [ ] **Gothic / European church** theme — pointed arches, ribbed vaults, stained glass
 - [ ] **Mughal / Indo-Islamic** theme — domes, marble, denser jali
 - [ ] **Greco-Roman** theme — fluted columns, pediments
 - [ ] Publish to npm; per-framework wrappers (React/Vue typings)

@@ -1,0 +1,46 @@
+/* ============================================================
+   Sthapati — Gothic / European-cathedral theme tokens
+   Cool limestone and slate, aged-gold linework, stained-glass
+   jewel accents, candle flame. Same variable names as chola.css —
+   only the values change, so components re-skin untouched.
+   Load this AFTER chola.css; [data-theme="gothic"] then wins.
+   ============================================================ */
+
+[data-theme="gothic"],
+sth-realm[theme="gothic"] {
+  /* --- Stone & ground --- */
+  --sth-granite:        #1a1f27;   /* slate shadow              */
+  --sth-granite-2:      #29313d;   /* lit limestone face        */
+  --sth-sandstone:      #b9c0c9;   /* weathered limestone       */
+  --sth-parchment:      #e9eaee;   /* cool vellum               */
+
+  /* --- Metal, glass & flame --- */
+  --sth-bronze:         #4a5360;   /* leaded came / dark metal  */
+  --sth-bronze-lit:     #5d6776;
+  --sth-gold:           #c4b078;   /* aged temple gold leaf     */
+  --sth-gold-bright:    #efd690;
+  --sth-vermilion:      #9e2b25;   /* stained-glass ruby        */
+  --sth-deepam:         #ffce6b;   /* candle flame              */
+
+  /* --- Semantic roles --- */
+  --sth-bg:             var(--sth-granite);
+  --sth-surface:        #222a34;
+  --sth-ink:            var(--sth-parchment);
+  --sth-ink-muted:      #9aa3af;
+  --sth-accent:         var(--sth-gold);
+  --sth-accent-strong:  #3a6ea5;   /* cobalt stained glass      */
+  --sth-line:           rgba(196, 176, 120, 0.34);
+
+  /* --- Form: Gothic is pointed and sharp, not squared --- */
+  --sth-radius:         1px;
+  --sth-carve:          0 1px 0 rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.05);
+  --sth-glow:           0 0 18px rgba(58, 110, 165, .45);
+
+  /* --- Type: legible inscriptional caps for UI, humanist serif body.
+     (Blackletter is reserved for big display headings — see the H1 rule
+     in the demo — because it's unreadable at small label sizes.) --- */
+  --sth-font-display:   "Cinzel", "Trajan Pro", Georgia, serif;
+  --sth-font-blackletter: "UnifrakturMaguntia", "Cinzel", serif;
+  --sth-font-body:      "EB Garamond", "Spectral", Georgia, serif;
+  --sth-tracking:       0.1em;
+}

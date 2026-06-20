@@ -317,17 +317,322 @@ const ORNAMENT = {
   },
 };
 
-/* tiny helper to register a component from a template + style string */
+/* ============================================================
+   GOTHIC / EUROPEAN-CATHEDRAL ORNAMENTS
+   The second theme. Same procedural approach, same CSS theme
+   variables — only the *forms* change: pointed arches, crocketed
+   spires, bar tracery, clustered piers, fleur-de-lis, lanterns.
+   This is what makes a "swap one stylesheet → reskin" real.
+   ============================================================ */
+const TAU = Math.PI * 2;
+
+/* n-lobed foil (trefoil=3, quatrefoil=4) as overlapping lobe circles */
+function foil(cx, cy, r, n, rot = -Math.PI / 2) {
+  let s = "";
+  for (let i = 0; i < n; i++) {
+    const a = rot + TAU * i / n;
+    s += `<circle cx="${P(cx + Math.cos(a) * r * 0.52)}" cy="${P(cy + Math.sin(a) * r * 0.52)}" r="${P(r * 0.5)}"/>`;
+  }
+  return s;
+}
+function foilGroup(cx, cy, r, n, fill = "none") {
+  return `<g fill="${fill}" stroke="${A}" stroke-width="0.7">${foil(cx, cy, r, n)}</g>`;
+}
+
+/* a crocket — a curling leaf bud climbing a spire or gable slope */
+function crocket(x, y, s, dir) {
+  return `<path d="M${P(x)} ${P(y)} q ${P(dir*0.1*s)} ${P(-0.9*s)} ${P(dir*0.9*s)} ${P(-s)} q ${P(-dir*0.5*s)} ${P(0.05*s)} ${P(-dir*0.35*s)} ${P(0.7*s)} z" fill="${A}" fill-opacity="0.22" stroke="${A}" stroke-width="0.7"/>`;
+}
+function crocketsAlong(x1, y1, x2, y2, count, dir, s) {
+  let out = "";
+  for (let i = 1; i <= count; i++) {
+    const t = i / (count + 1);
+    out += crocket(x1 + (x2 - x1) * t, y1 + (y2 - y1) * t, s, dir);
+  }
+  return out;
+}
+/* a fleur / cross finial atop a spire */
+function finial(cx, by, s) {
+  return `<g stroke="${A}" stroke-width="1" fill="${FILL}">
+    <path d="M${P(cx)} ${P(by)} L ${P(cx)} ${P(by-2.6*s)}"/>
+    <path d="M${P(cx-0.7*s)} ${P(by-1.8*s)} L ${P(cx+0.7*s)} ${P(by-1.8*s)}"/>
+    ${foilGroup(cx, by - 2.9 * s, 0.55 * s, 4)}
+  </g>`;
+}
+
+const GOTHIC = {
+  /* CROWN — a crocketed gable (wimperg) over bar-tracery, flanked by
+     two pinnacles and topped by a fleur finial. The cathedral facade. */
+  crown: (w = 150, h = 138) => {
+    const VW = 240, VH = 220, cx = 120, apex = 26, baseY = 168;
+    const lx = 62, rx = 178;
+    let s = "";
+    /* plinth steps */
+    s += `<g stroke="${A2}" stroke-width="0.8" fill="${FILL}">
+      <rect x="34" y="186" width="172" height="9"/>
+      <rect x="44" y="178" width="152" height="8"/>
+    </g>`;
+    /* string-course quatrefoil band */
+    s += `<rect x="48" y="168" width="144" height="11" stroke="${A}" stroke-width="0.9" fill="${FILL}"/>`;
+    for (let i = 0; i < 9; i++)
+      s += `<g transform="translate(${P(58 + i*16)} 173.5)">${foilGroup(0, 0, 4.6, 4)}</g>`;
+    /* gable (wimperg) */
+    s += `<path d="M${lx} ${baseY} L ${cx} ${apex} L ${rx} ${baseY}" stroke="${A}" stroke-width="1.4" fill="${FILL}"/>`;
+    s += `<path d="M${lx+12} ${baseY} L ${cx} ${apex+18} L ${rx-12} ${baseY}" stroke="${A2}" stroke-width="0.8" fill="none"/>`;
+    /* bar-tracery window inside the gable: two lancets + quatrefoil */
+    s += `<path d="M82 ${baseY} L82 118 Q82 92 120 80 Q158 92 158 118 L158 ${baseY} Z" stroke="${A}" stroke-width="1" fill="none"/>`;
+    s += `<path d="M120 ${baseY} L120 104" stroke="${A}" stroke-width="0.9"/>`;
+    s += `<path d="M90 ${baseY} L90 124 Q90 112 104 108 Q118 112 118 124 L118 ${baseY}" stroke="${A2}" stroke-width="0.8" fill="none"/>`;
+    s += `<path d="M122 ${baseY} L122 124 Q122 112 136 108 Q150 112 150 124 L150 ${baseY}" stroke="${A2}" stroke-width="0.8" fill="none"/>`;
+    s += `<g transform="translate(120 100)">${foilGroup(0, 0, 11, 4)}</g>`;
+    /* crockets up both gable slopes + finial */
+    s += crocketsAlong(cx, apex + 6, lx, baseY, 6, -1, 7);
+    s += crocketsAlong(cx, apex + 6, rx, baseY, 6, 1, 7);
+    s += finial(cx, apex, 6);
+    /* flanking pinnacles */
+    for (const px of [40, 200]) {
+      const pa = 96, pb = 182;
+      s += `<rect x="${px-12}" y="${pb-6}" width="24" height="12" stroke="${A}" stroke-width="0.9" fill="${FILL}"/>`;
+      s += `<path d="M${px-9} ${pb-6} L ${px} ${pa} L ${px+9} ${pb-6} Z" stroke="${A}" stroke-width="1" fill="${FILL}"/>`;
+      s += crocketsAlong(px, pa + 4, px - 9, pb - 6, 3, -1, 5);
+      s += crocketsAlong(px, pa + 4, px + 9, pb - 6, 3, 1, 5);
+      s += finial(px, pa, 4.2);
+    }
+    return `<svg class="sth-orn" viewBox="0 0 ${VW} ${VH}" width="${w}" height="${h}"
+              preserveAspectRatio="xMidYMax meet" aria-hidden="true">${s}</svg>`;
+  },
+
+  /* ARCH — an equilateral pointed arch with a hood-mould, crocket finial,
+     spandrel quatrefoils and label-stop bosses. */
+  arch: (w = 220, h = 150) => {
+    const VW = 220, VH = 150, cx = 110;
+    let s = "";
+    /* hood mould (outer) */
+    s += `<path d="M18 148 L18 70 Q18 22 ${cx} 8 Q ${VW-18} 22 ${VW-18} 70 L ${VW-18} 148" stroke="${A}" stroke-width="1.4" fill="none"/>`;
+    /* arch (inner) */
+    s += `<path d="M30 148 L30 72 Q30 34 ${cx} 20 Q ${VW-30} 34 ${VW-30} 72 L ${VW-30} 148" stroke="${A}" stroke-width="1.1" fill="none"/>`;
+    /* cusped soffit (trefoil tips) */
+    s += `<path d="M42 148 L42 74 Q42 46 ${cx} 32 Q ${VW-42} 46 ${VW-42} 74 L ${VW-42} 148" stroke="${A2}" stroke-width="0.8" fill="none" stroke-dasharray="1 3"/>`;
+    /* crocket finial at apex */
+    s += finial(cx, 8, 5);
+    s += crocketsAlong(cx, 14, 22, 60, 3, -1, 5);
+    s += crocketsAlong(cx, 14, VW - 22, 60, 3, 1, 5);
+    /* spandrel quatrefoils + springing bosses */
+    s += `<g transform="translate(40 44)">${foilGroup(0, 0, 9, 4)}</g>`;
+    s += `<g transform="translate(${VW-40} 44)">${foilGroup(0, 0, 9, 4)}</g>`;
+    s += `<circle cx="30" cy="70" r="3" fill="${A}"/><circle cx="${VW-30}" cy="70" r="3" fill="${A}"/>`;
+    return `<svg class="sth-arch-svg" viewBox="0 0 ${VW} ${VH}" width="${w}" height="${h}"
+              preserveAspectRatio="xMidYMin meet" aria-hidden="true">${s}</svg>`;
+  },
+
+  /* SCREEN — bar tracery: an arcade of pointed arches with quatrefoil heads. */
+  screen: (d = 7) => `
+    <svg class="veil" width="100%" height="100%" aria-hidden="true">
+      <defs>
+        <pattern id="tracery-${d}" width="${d*7}" height="${d*9}" patternUnits="userSpaceOnUse">
+          <g fill="none" stroke="var(--sth-line)" stroke-width="1">
+            <path d="M${P(d*0.5)} ${P(d*9)} L${P(d*0.5)} ${P(d*5)} Q${P(d*0.5)} ${P(d*1.6)} ${P(d*3.5)} ${P(d*0.8)} Q${P(d*6.5)} ${P(d*1.6)} ${P(d*6.5)} ${P(d*5)} L${P(d*6.5)} ${P(d*9)}"/>
+            <path d="M${P(d*3.5)} ${P(d*9)} L${P(d*3.5)} ${P(d*4.2)}"/>
+            <g transform="translate(${P(d*3.5)} ${P(d*3)})">${foil(0, 0, d * 1.1, 4)}</g>
+          </g>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#tracery-${d})"/>
+    </svg>`,
+
+  /* COLUMN capital — a foliate bell (stiff-leaf crockets) under an abacus. */
+  capital: () => `
+    <svg viewBox="0 0 54 72" width="100%" aria-hidden="true">
+      <g stroke="${A}" stroke-width="1" fill="${FILL}" stroke-linejoin="round">
+        <rect x="6" y="2" width="42" height="6"/>
+        <path d="M14 8 Q10 26 27 30 Q44 26 40 8 Z"/>
+        ${crocketsAlong(27, 26, 13, 10, 2, -1, 5)}
+        ${crocketsAlong(27, 26, 41, 10, 2, 1, 5)}
+        <circle cx="27" cy="20" r="2" fill="${A}" stroke="none"/>
+        <rect x="20" y="30" width="14" height="5"/>
+        <ellipse cx="27" cy="36" rx="9" ry="3"/>
+      </g>
+    </svg>`,
+  /* COLUMN base — torus mouldings over an octagonal plinth with spurs. */
+  base: () => `
+    <svg viewBox="0 0 54 60" width="100%" aria-hidden="true">
+      <g stroke="${A}" stroke-width="1" fill="${FILL}" stroke-linejoin="round">
+        <rect x="20" y="0" width="14" height="6"/>
+        <ellipse cx="27" cy="11" rx="13" ry="5"/>
+        <ellipse cx="27" cy="20" rx="16" ry="5"/>
+        <path d="M8 26 L46 26 L42 52 L12 52 Z"/>
+        <path d="M12 52 q -6 2 -8 6 M42 52 q 6 2 8 6" fill="none"/>
+        ${foilGroup(27, 40, 6, 3)}
+      </g>
+    </svg>`,
+  shaftBg: "repeating-linear-gradient(90deg, var(--sth-granite) 0 2px, var(--sth-granite-2) 2px 7px, #11161d 7px 8px, var(--sth-granite-2) 8px 13px)",
+
+  /* CAP — a fleur-de-lis (replaces the lotus at frieze tips). */
+  cap: (size = 26) => {
+    const cx = 18;
+    return `<svg viewBox="0 0 36 30" width="${size}" height="${P(size*30/36)}" aria-hidden="true">
+      <g stroke="${A}" stroke-width="0.8" fill="${A}" fill-opacity="0.22" stroke-linejoin="round">
+        <path d="M${cx} 3 C ${cx+3} 10 ${cx+2} 16 ${cx} 22 C ${cx-2} 16 ${cx-3} 10 ${cx} 3 Z"/>
+        <path d="M${cx} 13 C ${cx+6} 9 ${cx+12} 13 ${cx+9} 21 C ${cx+6} 16 ${cx+2} 16 ${cx} 20 Z"/>
+        <path d="M${cx} 13 C ${cx-6} 9 ${cx-12} 13 ${cx-9} 21 C ${cx-6} 16 ${cx-2} 16 ${cx} 20 Z"/>
+        <rect x="${cx-7}" y="20" width="14" height="3" rx="1"/>
+      </g>
+    </svg>`;
+  },
+
+  /* LAMP — a hanging cathedral lantern with a pointed roof and a flame. */
+  lamp: (w = 24, h = 44) => {
+    const cx = 30;
+    return `<svg viewBox="0 0 60 110" width="${w}" height="${h}" aria-hidden="true">
+      <g stroke="${A}" stroke-width="1" fill="${FILL}" stroke-linejoin="round">
+        <path d="M${cx} 2 L${cx} 16" /><circle cx="${cx}" cy="3" r="2"/>
+        <path d="M${cx-16} 40 L${cx} 16 L${cx+16} 40 Z"/>
+        ${finial(cx, 16, 3)}
+        <rect x="${cx-15}" y="40" width="30" height="40"/>
+        <path d="M${cx-15} 40 L${cx-15} 80 M${cx} 40 L${cx} 80 M${cx+15} 40 L${cx+15} 80" stroke="${A2}" stroke-width="0.7"/>
+        <path d="M${cx-15} 80 L${cx} 92 L${cx+15} 80" />
+      </g>
+      <g class="sth-flame">
+        <path d="M${cx} 50 C ${cx+4} 60 ${cx+5} 64 ${cx+2} 70 C ${cx-3} 74 ${cx-5} 64 ${cx} 50 Z" fill="var(--sth-deepam)"/>
+        <ellipse cx="${cx}" cy="64" rx="2.2" ry="4.6" fill="${GB}"/>
+      </g>
+    </svg>`;
+  },
+
+  /* ROSE WINDOW — radial bar tracery. Bonus named ornament + spinner. */
+  rose: (size = 120) => {
+    const c = 60, R = 54;
+    let s = `<circle cx="${c}" cy="${c}" r="${R}" stroke="${A}" stroke-width="1.4" fill="none"/>
+             <circle cx="${c}" cy="${c}" r="${R-7}" stroke="${A2}" stroke-width="0.8" fill="none"/>`;
+    const petals = 8;
+    for (let i = 0; i < petals; i++) {
+      const a = TAU * i / petals;
+      const px = c + Math.cos(a) * (R - 18), py = c + Math.sin(a) * (R - 18);
+      s += `<line x1="${c}" y1="${c}" x2="${P(c+Math.cos(a)*(R-7))}" y2="${P(c+Math.sin(a)*(R-7))}" stroke="${A2}" stroke-width="0.8"/>`;
+      s += `<g transform="translate(${P(px)} ${P(py)})">${foilGroup(0, 0, 9, 3, "rgba(212,161,60,0.10)")}</g>`;
+    }
+    s += foilGroup(c, c, 10, 6, "rgba(212,161,60,0.18)");
+    return `<svg viewBox="0 0 120 120" width="${size}" height="${size}" aria-hidden="true">${s}</svg>`;
+  },
+};
+
+/* ------------------------------------------------------------------
+   CHOLA column parts (extracted so both <sth-pillar> and the themed
+   <sth-column> can share them).
+   ------------------------------------------------------------------ */
+function cholaCapital() {
+  return `
+    <svg viewBox="0 0 54 78" width="100%" aria-hidden="true">
+      <g stroke="${A}" stroke-width="1" fill="${FILL}" stroke-linejoin="round">
+        <path d="M4 5 H50 V13 Q50 17 46 18 L40 19 Q41 13 36 13 L18 13 Q13 13 14 19 L8 18 Q4 17 4 13 Z"/>
+        <line x1="6" y1="9" x2="48" y2="9" stroke="${A2}" stroke-width="0.6"/>
+        <circle cx="12" cy="15.5" r="1.4" fill="${A}" stroke="none"/>
+        <circle cx="42" cy="15.5" r="1.4" fill="${A}" stroke="none"/>
+        <rect x="9" y="20" width="36" height="6"/>
+        ${beads(13, 41, 23, 0.8, 1.6, A)}
+        <path d="M18 27 H36 L34 31 Q44 36 38 44 Q27 50 16 44 Q10 36 20 31 Z"/>
+        <line x1="14" y1="40" x2="40" y2="40" stroke="${A2}" stroke-width="0.6"/>
+        <rect x="20" y="49" width="14" height="5"/>
+      </g>
+    </svg>`;
+}
+function cholaBase() {
+  return `
+    <svg viewBox="0 0 54 66" width="100%" aria-hidden="true">
+      <g stroke="${A}" stroke-width="1" fill="${FILL}" stroke-linejoin="round">
+        <rect x="20" y="0" width="14" height="6"/>
+        <path d="M16 7 Q27 4 38 7 Q44 13 38 18 H16 Q10 13 16 7 Z"/>
+        <rect x="13" y="19" width="28" height="5"/>
+        <rect x="9"  y="24" width="36" height="6"/>
+        <rect x="5" y="30" width="44" height="30"/>
+        ${kudu(27, 52, 7)}
+        ${beads(9, 45, 33, 0.8, 1.8, A)}
+      </g>
+    </svg>`;
+}
+const CHOLA_SHAFT_BG =
+  "linear-gradient(90deg, var(--sth-granite) 0%, #4b4034 16%, var(--sth-granite-2) 50%, #4b4034 84%, var(--sth-granite) 100%)";
+
+function cholaScreenVeil(d) {
+  return `
+    <svg class="veil" width="100%" height="100%" aria-hidden="true">
+      <defs>
+        <pattern id="jali-${d}" width="${d*6}" height="${d*6}" patternUnits="userSpaceOnUse">
+          <g fill="none" stroke="var(--sth-line)" stroke-width="1" transform="translate(${d*3} ${d*3})">
+            <path d="M0 -${d*2.6} L${d*2.6} 0 L0 ${d*2.6} L-${d*2.6} 0 Z"/>
+            <circle cx="0" cy="0" r="${d*1.1}"/>
+            <path d="M0 -${d*1.1} L${d*1.1} 0 L0 ${d*1.1} L-${d*1.1} 0 Z"/>
+          </g>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#jali-${d})"/>
+    </svg>`;
+}
+
+/* ============================================================
+   THEME REGISTRY — maps each semantic role to a per-theme generator.
+   Add a dynasty = add an entry here + a matching CSS file.
+   ============================================================ */
+const THEMES = {
+  chola: {
+    name: "Chola",
+    crown:   (w, h) => ORNAMENT.gopuram(w, h),
+    arch:    () => ORNAMENT.torana(),
+    screen:  (d) => cholaScreenVeil(d),
+    capital: () => cholaCapital(),
+    base:    () => cholaBase(),
+    shaftBg: CHOLA_SHAFT_BG,
+    cap:     (s) => ORNAMENT.lotusCap(s),
+    lamp:    (w, h) => ORNAMENT.deepam(w, h),
+  },
+  gothic: {
+    name: "Gothic",
+    crown:   GOTHIC.crown,
+    arch:    GOTHIC.arch,
+    screen:  GOTHIC.screen,
+    capital: GOTHIC.capital,
+    base:    GOTHIC.base,
+    shaftBg: GOTHIC.shaftBg,
+    cap:     GOTHIC.cap,
+    lamp:    GOTHIC.lamp,
+  },
+};
+
+/* resolve the active theme for an element (nearest [data-theme] wins) */
+function themeName(el) {
+  const node = el.closest("[data-theme]");
+  const t = (node && node.getAttribute("data-theme")) ||
+            document.documentElement.getAttribute("data-theme") || "chola";
+  return THEMES[t] ? t : "chola";
+}
+function themeOf(el) { return THEMES[themeName(el)]; }
+
+/* live instances re-render when the active theme changes */
+const INSTANCES = new Set();
+function rerenderAll() { INSTANCES.forEach((el) => el._render && el._render(el, el._root)); }
+
+/* tiny helper to register a component; re-renders on theme change */
 function define(tag, render) {
   if (customElements.get(tag)) return;
   customElements.define(tag, class extends HTMLElement {
     connectedCallback() {
-      if (this._mounted) return;
-      this._mounted = true;
-      const root = this.attachShadow({ mode: "open" });
-      render(this, root);
+      if (!this._root) {
+        this._root = this.attachShadow({ mode: "open" });
+        this._render = render;
+        INSTANCES.add(this);
+      }
+      render(this, this._root);
     }
+    disconnectedCallback() { INSTANCES.delete(this); }
   });
+}
+
+if (typeof window !== "undefined") {
+  window.addEventListener("sth:themechange", rerenderAll);
+  if (document.documentElement) {
+    new MutationObserver(rerenderAll).observe(document.documentElement,
+      { attributes: true, attributeFilter: ["data-theme"] });
+  }
 }
 
 /* CSS shared into every shadow root so components honor page theme vars */
@@ -410,7 +715,7 @@ define("sth-card", (el, root) => {
       ::slotted(*) { font-family: var(--sth-font-body); line-height: 1.6; }
     </style>
     <div class="card">
-      ${crown ? `<div class="crown">${ORNAMENT.gopuram(150, 138)}</div>` : ""}
+      ${crown ? `<div class="crown">${themeOf(el).crown(150, 138)}</div>` : ""}
       ${title ? `<h3 class="title">${title}</h3><div class="rule"></div>` : ""}
       <slot></slot>
     </div>`;
@@ -437,7 +742,7 @@ define("sth-arch", (el, root) => {
       .inner { position: relative; color: var(--sth-ink); font-family: var(--sth-font-body);
                text-align: center; }
     </style>
-    <div class="crown">${ORNAMENT.torana()}</div>
+    <div class="crown">${themeOf(el).arch()}</div>
     <span class="jamb l"></span><span class="jamb r"></span><span class="sill"></span>
     <div class="inner"><slot></slot></div>`;
 });
@@ -462,10 +767,10 @@ define("sth-divider", (el, root) => {
                white-space: nowrap; }
     </style>
     <div class="row">
-      ${ORNAMENT.lotusCap()}
+      ${themeOf(el).cap()}
       <span class="line"></span>
       ${label ? `<span class="label">${label}</span><span class="line"></span>` : ""}
-      ${ORNAMENT.lotusCap()}
+      ${themeOf(el).cap()}
     </div>`;
 });
 
@@ -579,7 +884,77 @@ define("sth-lamp", (el, root) => {
       @keyframes flick { 0%,100%{ transform: scaleY(1) } 50%{ transform: scaleY(1.1) translateY(-1px) } }
       @media (prefers-reduced-motion: reduce){ .sth-flame{ animation:none } }
     </style>
-    ${ORNAMENT.deepam(24, 44)}<slot></slot>`;
+    ${themeOf(el).lamp(24, 44)}<slot></slot>`;
+});
+
+/* ===============================================================
+   SEMANTIC PRIMITIVES — role tags whose carved FORM is chosen by the
+   active theme. <sth-crown> is a gopuram in chola, a crocketed gable
+   in gothic; same markup, different building.
+   =============================================================== */
+
+/* <sth-crown> — a standalone header crown (section / page banner). */
+define("sth-crown", (el, root) => {
+  root.innerHTML = `
+    <style>
+      ${SHARED}
+      :host { display: block; text-align: center; line-height: 0; }
+      svg { display: inline-block; }
+    </style>
+    ${themeOf(el).crown(190, 176)}`;
+});
+
+/* <sth-screen> — a themed perforated screen behind slotted content.
+   chola → kolam jali · gothic → bar tracery. Attribute: density. */
+define("sth-screen", (el, root) => {
+  const d = Number(el.getAttribute("density") || 7);
+  root.innerHTML = `
+    <style>
+      ${SHARED}
+      :host { display: block; position: relative; }
+      .veil { position: absolute; inset: 0; opacity: .5; pointer-events: none; }
+      .content { position: relative; padding: 1.4rem; color: var(--sth-ink);
+                 font-family: var(--sth-font-body); }
+    </style>
+    ${themeOf(el).screen(d)}
+    <div class="content"><slot></slot></div>`;
+});
+
+/* <sth-column> — a themed load-bearing column (capital + shaft + base).
+   chola → kumbha pillar · gothic → clustered pier. */
+define("sth-column", (el, root) => {
+  const t = themeOf(el);
+  root.innerHTML = `
+    <style>
+      ${SHARED}
+      :host { display: flex; flex-direction: column; align-items: stretch;
+              width: 56px; align-self: stretch; }
+      .cap, .base { flex: 0 0 auto; }
+      .cap svg, .base svg { display: block; }
+      .shaft { flex: 1 1 auto; position: relative; min-height: 48px; margin: -1px 9px 0;
+               background: ${t.shaftBg};
+               border-left: 1px solid var(--sth-line);
+               border-right: 1px solid var(--sth-line); }
+    </style>
+    <div class="cap">${t.capital()}</div>
+    <div class="shaft"></div>
+    <div class="base">${t.base()}</div>`;
+});
+
+/* <sth-rose-window> — Gothic radial tracery. A named ornament; also a
+   spinner when spin is set. Attributes: size, spin. */
+define("sth-rose-window", (el, root) => {
+  const size = Number(el.getAttribute("size") || 120);
+  const spin = el.hasAttribute("spin");
+  root.innerHTML = `
+    <style>
+      ${SHARED}
+      :host { display: inline-block; line-height: 0; }
+      .spin { animation: sth-rose-spin 9s linear infinite; transform-origin: 50% 50%; }
+      @keyframes sth-rose-spin { to { transform: rotate(360deg); } }
+      @media (prefers-reduced-motion: reduce){ .spin{ animation:none } }
+    </style>
+    <div class="${spin ? "spin" : ""}">${GOTHIC.rose(size)}</div>`;
 });
 
 /* ---------------------------------------------------------------
@@ -596,5 +971,18 @@ define("sth-realm", (el, root) => {
    <script>, an ES module, or imported for side effects by a bundler.
    (Classic <script> matters because it also works from a file:// URL,
    where browsers block <script type="module"> for security.) */
-const Sthapati = { version: "0.1.0", theme: "chola", ORNAMENT };
+const Sthapati = {
+  version: "0.1.0",
+  ORNAMENT,            // Chola named ornaments
+  GOTHIC,              // Gothic named ornaments
+  THEMES,              // theme registry (role → generator)
+  themes: () => Object.keys(THEMES),
+  /* switch the whole page's theme and re-render every component */
+  setTheme(name) {
+    if (!THEMES[name]) return false;
+    document.documentElement.setAttribute("data-theme", name);
+    window.dispatchEvent(new CustomEvent("sth:themechange", { detail: name }));
+    return true;
+  },
+};
 if (typeof window !== "undefined") window.Sthapati = Sthapati;

@@ -5,8 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Sthapati — Build the web like a temple</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Spectral:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Spectral:wght@400;500&family=UnifrakturMaguntia&family=EB+Garamond:wght@400;500&family=Cinzel:wght@500&display=swap" rel="stylesheet">
+  <!-- load both themes; the data-theme attribute on <html> selects one -->
   <link rel="stylesheet" href="src/themes/chola.css" />
+  <link rel="stylesheet" href="src/themes/gothic.css" />
   <script defer src="src/sthapati.js"></script>
   <style>
     body {
@@ -34,6 +37,18 @@
     .colonnade .bay { flex: 1; padding: 1.4rem 1.6rem; }
     code { font-family: ui-monospace, monospace; color: var(--sth-gold); }
     .muted { color: var(--sth-ink-muted); }
+    .switcher { display: inline-flex; gap: .4rem; margin: .9rem 0 .2rem;
+                border: 1px solid var(--sth-line); border-radius: 3px; padding: .25rem; }
+    .switcher button { font-family: var(--sth-font-display); letter-spacing: .14em;
+                text-transform: uppercase; font-size: .68rem; color: var(--sth-ink-muted);
+                background: transparent; border: 0; padding: .45rem .9rem; cursor: pointer;
+                border-radius: 2px; transition: background .2s, color .2s; }
+    .switcher button[aria-pressed="true"] { background: var(--sth-bronze);
+                color: var(--sth-ink); box-shadow: var(--sth-carve); }
+    body { transition: background-color .4s ease, color .4s ease; }
+    /* Gothic: blackletter reserved for the big display title only */
+    [data-theme="gothic"] h1 { font-family: var(--sth-font-blackletter), serif;
+                               letter-spacing: .06em; }
     .gallery { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center;
                align-items: flex-end; margin: 1.4rem 0; }
     .gallery figure { margin: 0; text-align: center; }
@@ -52,8 +67,29 @@
     <header>
       <sth-lamp>Live demo</sth-lamp>
       <h1>Sthapati</h1>
-      <p class="tag">Build the web like a temple · Chola theme</p>
+      <p class="tag" id="tagline">Build the web like a temple · Chola theme</p>
+      <div class="switcher" role="group" aria-label="Theme">
+        <button data-theme-btn="chola" aria-pressed="true">Chola</button>
+        <button data-theme-btn="gothic" aria-pressed="false">Gothic</button>
+      </div>
+      <p class="muted" style="font-size:.72rem;letter-spacing:.04em">
+        Same markup below — switch the theme and the whole building changes.
+      </p>
     </header>
+    <script>
+      addEventListener("DOMContentLoaded", () => {
+        const btns = [...document.querySelectorAll("[data-theme-btn]")];
+        const labels = { chola: "Build the web like a temple · Chola theme",
+                         gothic: "Raise the web like a cathedral · Gothic theme" };
+        const sync = (t) => {
+          btns.forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.themeBtn === t)));
+          if (labels[t]) document.getElementById("tagline").textContent = labels[t];
+        };
+        btns.forEach((b) => b.addEventListener("click", () => window.Sthapati.setTheme(b.dataset.themeBtn)));
+        // stay in sync however the theme changes (button or Sthapati.setTheme())
+        addEventListener("sth:themechange", (e) => sync(e.detail));
+      });
+    </script>
 
     <sth-divider label="The Carvings"></sth-divider>
 
@@ -63,6 +99,7 @@
       <figure><div class="plate" id="g-kirti"></div><figcaption>Kīrtimukha · face of glory</figcaption></figure>
       <figure><div class="plate" id="g-deepam"></div><figcaption>Deepam · standing lamp</figcaption></figure>
       <figure><div class="plate" id="g-lotus"></div><figcaption>Padma · lotus</figcaption></figure>
+      <figure><div class="plate"><sth-rose-window size="120" spin></sth-rose-window></div><figcaption>Rose window · Gothic</figcaption></figure>
     </div>
     <script>
       addEventListener("DOMContentLoaded", () => {
@@ -104,24 +141,29 @@
     <sth-divider label="Colonnade"></sth-divider>
 
     <div class="colonnade">
-      <sth-pillar></sth-pillar>
-      <sth-jali class="bay" density="6">
+      <sth-column></sth-column>
+      <sth-screen class="bay" density="6">
         <h3 style="font-family:var(--sth-font-display);letter-spacing:.12em;color:var(--sth-accent);margin-top:0">
-          Jali screen
+          Pierced screen
         </h3>
-        <p>A pierced-stone lattice sits behind content as a perforated veil —
-        light filtered through carved geometry. Wrap any section in
-        <code>&lt;sth-jali&gt;</code> for the effect.</p>
+        <p>A perforated screen sits behind content as a veil of filtered light.
+        It renders as a <code>kolam jali</code> in Chola and as
+        <code>bar tracery</code> in Gothic — same <code>&lt;sth-screen&gt;</code>,
+        flanked by themed <code>&lt;sth-column&gt;</code>s.</p>
         <sth-button>Request a darshan</sth-button>
-      </sth-jali>
-      <sth-pillar></sth-pillar>
+      </sth-screen>
+      <sth-column></sth-column>
     </div>
 
     <sth-divider label="One line to use it"></sth-divider>
     <pre style="overflow:auto;background:var(--sth-surface);padding:1rem;border:1px solid var(--sth-line);border-radius:2px"><code>&lt;script defer src="src/sthapati.js"&gt;&lt;/script&gt;
 &lt;link rel="stylesheet" href="src/themes/chola.css"&gt;
+&lt;link rel="stylesheet" href="src/themes/gothic.css"&gt;
 
-&lt;sth-card title="Gopuram"&gt;Hello, temple.&lt;/sth-card&gt;</code></pre>
+&lt;html data-theme="chola"&gt;            &lt;!-- or "gothic" --&gt;
+  &lt;sth-card title="Gopuram"&gt;Hello, temple.&lt;/sth-card&gt;
+
+&lt;script&gt; Sthapati.setTheme("gothic") &lt;/script&gt;  &lt;!-- reskins everything --&gt;</code></pre>
   </div>
 </body>
 </html>
