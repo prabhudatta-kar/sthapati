@@ -107,6 +107,14 @@ It also defines the **two-layer model**: *semantic primitives* that re-skin per
 theme (`<sth-arch>`, `<sth-crown>`, `<sth-screen>`) vs *named ornaments* for
 specific motifs (`<sth-gopuram>`, `<sth-rose-window>`).
 
+## Where this is headed
+
+[**docs/BENCHMARK.md**](docs/BENCHMARK.md) benchmarks Sthapati against the
+libraries people actually adopt (shadcn/ui, 21st.dev, Radix, Aceternity) — an
+honest scorecard and a phased path to credibility. Short version: the *reason to
+exist* is done; the table-stakes (accessibility, TypeScript, functional
+components, one-command install, real docs) are the work ahead.
+
 ## Roadmap
 
 - [x] **Chola / Dravidian** theme (v0.1)
